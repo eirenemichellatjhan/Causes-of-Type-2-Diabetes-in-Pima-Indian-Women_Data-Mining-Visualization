@@ -1,0 +1,967 @@
+---
+title: "From Data to Diagnosis: Predicting Diabetes"
+author: "Eirene Michella Tjhan"
+date: "2024-06-20"
+output: 
+  html_document:
+    keep_md: true
+  pdf_document:
+    latex_engine: xelatex
+always_allow_html: true
+warning: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = FALSE, message = FALSE, warning = FALSE)
+```
+
+Eirene Michella Tjhan  
+2702256630  
+Group 8  
+
+# 1. INTRODUCTION
+  
+Dataset : Diabetes Patients Data  
+Source : https://www.kaggle.com/datasets/akshaydattatraykhare/diabetes-dataset?resource=download  
+  
+This report discusses the problem of using different medical measurements to predict diabetes in Pima Indian women. The patients in the dataset are female Pima Indians, who are at least 21 years old and are known to have one of the highest rates of Type 2 diabetes globally.  
+  
+**Structure**  
+1. Intoduction  
+2. Data Description  
+    + a) Problem Identification  
+    + b) Description  
+3. Data Preprocessing  
+4. Data Exploration  
+    + a) Examine Descirptive Statistic  
+    + b) Frequency Distribution  
+    + c) Data Visualization  
+    + d) Data Anomalies  
+5. Statistical Analysis  
+    + a) Checking Precondition  
+    + b) Find Correlation  
+    + c) Check the Regression  
+6. Discussion  
+7. Conclusion  
+8. References  
+  
+**Context**    
+Type 2 diabetes is a chronic condition characterized by high blood sugar levels due to the body's inability to use insulin effectively. More than 50% of people in the Pima Indian population have been diagnosed with this condition, making them significantly at risk. The increasing number of cases of diabetes has been correlated to environmental factors, changes in lifestyle, and hereditary factors. Understanding and predicting diabetes within this population can help in early diagnosis and effective management of the disease.  
+  
+**Importance and Relevance**  
+1. Diabetes causes serious health issues, such as hypertension and kidney failure, in which, both of them are common among Pima Indians.  
+2. In order to manage and lower the risk of diabetes, early detection may help in the implementation of changes in lifestyle and prevention strategies.  
+  
+**Intended Audience**  
+1. Researchers who are interested in understanding the factors that may cause to diabetes in Pima Indian women.  
+2. Anyone interested in the wider effects of diabetes and the health issues the Pima Indian population is facing.  
+  
+**Goals**  
+1. What factors that cause diabetes?  
+2. What variables can be the indicators of diabetes?   
+3. Why should we be aware of diabetes and what insight can we gain?  
+  
+**Methods**  
+1. Exploratory Data Analysis (EDA): Statistic summary (location, spread, shape), Data visualization (identify outliers and find relationship between variables)  
+2. Statistical Analytic: Shapiro-Wilk test (data normality) and Pearson Correlation (linear relationship)  
+  
+**Assumptions and Limitations**  
+- Assumptions: Based on the variables in this dataset, there are two major factors that affect diabetes, lifestyle (BMI, SkinThickness) and heredity (DiabetesPedigreeFunction).  
+- Limitations: This analysis is limited to the variables provided in the dataset, while there are external factors that may also affect diabetes. Thus, the analytical conclusion might not apply to other populations.  
+  
+**Conclusion**  
+Prediction based on the analysis we conducted is important because diabetes can lead to many damages in the body, such as hypertension, which has the potential to damage blood circulation throughout the body. When we predict and identify people at risk of diabetes, healthcare professionals can step in with early preventive method to reduce the chances of issues for example high blood pressure and heart problems that come with diabetes.This analysis can significantly improve the overall health outcomes and quality of life for individuals affected by diabetes.  
+
+# 2. DATA DESCRIPTION
+## a) PROBLEM IDENTIFICATION
+The data used for this analysis is originally from the National Institute of Diabetes and Digestive and Kidney Diseases and is made available on Kaggle by Mehmet Akturk. The objective of the dataset is to diagnostically predict whether or not a patient has diabetes, based on some measurement that is included in the dataset as well. All patients in the dataset are females Pima Indian heritage with at least 21 years old.   
+  
+**Who is Pima Indians female?** Pima Indians (of Arizona, USA) have one of the highest recorded prevalence rates (total number of cases of a disease in a given statistical population at a given time, divided by the number of individuals in that population) of Type 2 diabetes in the world. Studies have shown that more than 50% of the adult population has Type 2 diabetes.  
+
+**What is Type 2 diabetes?**  
+Type 2 diabetes is a chronic condition can be recognized by high blood sugar levels due to the body's inability to use insulin effectively, often paired with insufficient insulin production. Insulin is a hormone produced by pancreas that helps glucose enter cells to be used for energy. In type 2 diabetes, the body's cells become resistant to insulin's effects, and the pancreas cannot produce enough insulin to overcome this resistance. And this can lead the pancreas to produce less insulin.  
+  
+There are several factors that took part of these problem, such as:  
+**1. Genetic factors**  
+      - The studies show that having a first-degree relative with diabetes (Diabetes Pedigree Function), will significantly increase a person's risk to develop diabetes as well.  
+**2. Environment and lifestyle changes**  
+      - Pima Indians depending their life food supply by traditional agricultural, but due to the environmental change (weather), it is more possible to get food form the retail stores, rather than planting food themselves.  
+      - So we can say, they move on to more modern lifestyle food, mostly processed foods that have high rates of sugar, compared with the food they gain from agricultural.  
+      - The modernization also affect the amount of physical activity of the Pima Indians. They tend to be more 'lazy' because they rely on retail food stores, rather than growing their food by hand.  
+      - The physical activity may contribute as an important factor in weight control (prevent obesity) and therefore, the prevention of diabetes. 
+      
+**Side affect of diabetes on Pima Indias?**  
+1. Hyperglycemia : The cause of diabetes is because the body either does not produce enough insulin (Type 1 diabetes) or cannot effectively use the insulin it produces (Type 2 diabetes), leading to elevated blood glucose levels.  
+2. Hypertension : People with diabetes are more likely to have high blood pressure (hypertension) due to insulin resistance (in which the studies have found similar issue in Pima Indians), inflammation, and vascular damage caused by high blood glucose levels.  
+      
+**In conclusion,** historical data suggest that diabetes was rare among the Pima before the adoption of modern lifestyles and diets. This is bad because the Arizona Pimas have an extraordinarily high rate of kidney disease in a result of diabetes, while kidney failure is a leading cause of death.   
+
+Source : https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4418458/ 
+
+## b) DESCRIPTION
+Explanation of attributes (variables):  
+- **Pregnancies**: To express the Number of pregnancies  
+- **Glucose**: Plasma glucose concentration a 2 hours in an oral glucose tolerance test (OGTT) (mg/dL)  
+- **BloodPressure**: To express the Blood pressure measurement, Diastolic blood pressure (mm Hg)    
+- **SkinThickness**: To express the thickness of the skin, Triceps skin fold thickness (mm)  
+- **Insulin**: To express the Insulin level in blood, 2-Hour serum insulin (mu U/ml)  
+- **BMI**: To express the Body mass index (weight in kg/(height in m)^2)  
+- **DiabetesPedigreeFunction**: To express the Diabetes percentage  
+- **Age**: To express the age  
+- **Outcome**: To express the final result 1 is Yes and 0 is No  
+
+**_EXPLANATION_**  
+What is **Oral Glucose Tolerance Test** (OGTT)?  
+The OGTT is a diagnostic tool that measures how well the body processes glucose, in which can help to identify insulin resistance and diabetes. Insulin resistance is a condition where the body's cells become less responsive to insulin, often leading to elevated blood sugar levels. Insulin is crucial for regulating blood glucose levels by making it easier for cells to absorb glucose and use it as energy.  
+  
+Distributions of 2-hours **blood glucose levels** in OGTT:  
+- Normal: Less than 140 mg/dL (7.8 mmol/L)  
+- Prediabetes: 140 to 199 mg/dL (7.8 to 11.0 mmol/L)  
+- Diabetes: 200 mg/dL (11.1 mmol/L) or higher  
+  
+Distributions of diastolic **blood pressure**:  
+- Normal: Less than 80 mm Hg  
+- Elevated: Less than 80 mm Hg  q
+- Hypertension Stage 1: 80-89 mm Hg  
+- Hypertension Stage 2: 90 mm Hg or higher  
+- Hypertensive Crisis: Higher than 120 mm Hg (requires immediate medical attention) 
+  
+**SkinThickness** for female adults:    
+People with higher skin fold thickness indicates higher body fat which is a major risk factor of Type 2 diabetes due to obesity & insulin resistance that can lead to higher glucose level. 
+- Low: < 10mm  
+- Average: 10-25mm  
+- High: > 25mm  
+  
+**Insulin**:  
+Insulin concentration in the blood measured two hours after consuming the glucose drink in OGTT (16 to 166 μU/mL).  
+
+**BMI** can indicates whether a female has obesity or not:
+- Underweight: less than 18.5 kg/m²  
+- Normal: between 18.5 and 24.9 kg/m²  
+- Overweight: between 25.0 and 29.9 kg/m²  
+- Obesity:30.0 kg/m² and above   
+  
+**DiabetesPedigreeFunction**:  
+percentage of risk of developing diabetes based on family history.  
+
+# 3. DATA PREPROCESSING
+```{r}
+source("explorationFunction.R") # BasicSummary function
+library(corrplot) # correlation plot
+library(ggplot2) # bar plot, scatter plot
+library(dplyr)
+library(plotly)
+#tinytex::install_tinytex(force = TRUE)
+```
+
+```{r}
+# import CSV file
+data <- read.csv("C:/Users/acer/Downloads/diabetes.csv")
+df <- data.frame(data)
+head(df)
+```
+
+## How many records do we have? How many variables? 
+### a. `str` function
+```{r}
+str(df)
+```
+_EXPLANATION_  
+1. the first line shows that 'data' is a data frame, with 768 observations (rows), and 9 variables (attributes/columns).  
+2. the second, third, fourth, fifth, sixth, ninth, and tenth line tells us that they are integer variable (whole numbers).  
+3. the seventh and eighth line tells us that they are num variables (both integer and floating-point number).  
+4. although the variable 'outcome' get identified as int variable, it classified as categorical variable because 1 = yes, 0 = no.  
+
+### b. `summary` function
+```{r}
+summary(df)
+```
+_EXPLANATION_  
+For all of the numeric variables, it shows the Tukey's five-number result (sample minimum, lower quartile, sample median, upper quartile, sample maximum) and the mean value of each variable.  
+
+## What type is each variable (numeric, categorical, logical)?
+Categorical (logical):  
+- Outcome : Represents final result, where 1 indicates "Yes" and 0 indicates "No" for diabetes  
+
+Numerical:  
+- Pregnancies : Represents number of pregnancies  
+- Glucose : Represents glucose level in blood  
+- BloodPressure : Represents blood pressure measurement  
+- SkinThickness : Represents thickness of the skin  
+- Insulin : Represents insulin level in blood  
+- BMI : Represents body mass index  
+- DiabetesPedigreeFunction : Represents diabetes percentage (genetic probability of diabtes based on family history)  
+- Age : Represents age  
+
+## How many unique values does each variable have? 
+```{r}
+sapply(df, function(x) length(unique(x)))
+```
+_EXPLANATION_  
+Pregnancies: 17 unique values ranging from 0 to 17.  
+Glucose: 135 unique values ranging from 0 to 199.  
+BloodPressure: 47 unique values ranging from 0 to 122.  
+SkinThickness: 52 unique values ranging from 0 to 99.  
+Insulin: 186 unique values ranging from 0 to 846.  
+BMI: 248 unique values ranging from 0 to 67.1.  
+DiabetesPedigreeFunction: 517 unique values ranging from 0.078 to 2.42.  
+Age: 52 unique values ranging from 21 to 81.  
+Outcome: 2 unique values, either 0 or 1, indicating the absence or presence of diabetes, respectively.  
+
+## Is there duplicated data?
+```{r}
+sum(duplicated(df))
+```
+
+## What value occurs most frequently, and how often does it occur? 
+```{r}
+BasicSummary(df)
+```
+_EXPLANATION_  
+Or we can see from the BasicSummary from 'topLevel' and 'topCount' column.    
+- Pregnancies : 1  
+- Glucose : 99  
+- BloodPressure : 70 
+- SkinThickness : 0  
+- Insulin : 0  
+- BMI : 32  
+- DiabetesPedigreeFunction : 0.254  
+- Age : 22  
+- Outcome : 0  
+
+## Are there missing observations? If so, how frequently does this occur?
+```{r}
+missing_value <- sapply(df, function(x) sum(is.na(x)))
+missing_value
+```
+If we observe the dataset manually, we may found it weird there are so many 0 value. So in this dataset the missing value is not represent by N/A or NULL but with 0.  
+```{r}
+sum(df$Pregnancies == 0)
+sum(df$Glucose == 0)
+sum(df$BloodPressure == 0)
+sum(df$SkinThickness == 0)
+sum(df$Insulin == 0)
+sum(df$BMI == 0)
+sum(df$DiabetesPedigreeFunction == 0)
+sum(df$Age == 0)
+sum(df$Outcome == 0)
+```
+The possibility of variable Pregnancies, DiabetesPedigreeFunction, and Outcome to have 0 as their value is understandable, because in fact not all of them have pregnant. There's possibility they have 0 percentage of having diabetes. Outcome is categorical variable that act as the final result whether a person has diabetes or not (1 yes, 0 no).  
+
+```{r}
+## Replace missing values with mean/median for numerical variable
+median_SkinThickness <- median(df$SkinThickness)
+median_Insulin <- median(df$Insulin)
+mean_Glucose <- mean(df$Glucose)
+mean_BloodPressure <- mean(df$BloodPressure)
+mean_BMI <- mean(df$BMI)
+
+df$Glucose[df$Glucose==0] <- mean_Glucose
+df$BloodPressure[df$BloodPressure==0] <- mean_BloodPressure
+df$SkinThickness[df$SkinThickness==0] <- median_SkinThickness
+df$Insulin[df$Insulin==0] <- median_Insulin
+df$BMI[df$BMI==0] <- mean_BMI
+
+sum(df$Glucose==0)
+sum(df$BloodPressure==0)
+sum(df$SkinThickness==0)
+sum(df$Insulin==0)
+sum(df$BMI==0)
+```
+So the preprocessing of the dataset: replacing rows that have 0 in Glucose/BloodPressure/SkinThickness/Insulin/BMI with the median or mean of the variables itself.  
+
+# 4. DATA EXPLORATION
+## a) EXAMINE DESCRIPTIVE STATISTIC
+### Location (Central Tendency)
+```{r}
+# numerical (mean/median/variance)
+# average value for each variable, representing the central tendency or location
+mean_Pregnancies = mean(df$Pregnancies)
+mean_Glucose = mean(df$Glucose)
+mean_BloodPressure = mean(df$BloodPressure)
+mean_SkinThickness = mean(df$SkinThickness)
+mean_Insulin = mean(df$Insulin)
+mean_BMI = mean(df$BMI)
+mean_DiabetesPedigreeFunction = mean(df$DiabetesPedigreeFunction)
+mean_Age = mean(df$Age)
+
+mean_Pregnancies
+mean_Glucose
+mean_BloodPressure
+mean_SkinThickness
+mean_Insulin
+mean_BMI
+mean_DiabetesPedigreeFunction
+mean_Age
+```
+_EXPLANATION_  
+1. The mean frequencies of pregnancy occur is 3.85.  
+2. The average of Glucose (Plasma glucose concentration) level of (121.68 mg/dL) on Oral glucose tolerance tests (OGTT) shows that it was categorized as normal glucose level (Normal: Less than 140 mg/dL).  
+3. The average of diastolic blood pressure (72.25 mm Hg) shows that it was indeed normal (Normal: Less than 80 mm Hg).  
+4. The average of skinThickness (27.33mm) show that it was consider as High, in which can indicates higher body fat (obesity), but there might be other factor that can affect this (SkinThickness alone may not necessarily mean obesity).  
+5. The average of insulin concentration in the blood measured two hours after consuming the glucose drink in OGTT (94.65 μU/mL) can be considered as low (normal 100-150) and may indicate the insulin resistance (problems of handling glucose).  
+6. The average BMI of (32.45 kg/m²) shows that there are general obesity trend within the samples (obesity : 30.0 kg/m² and above), and this can lead to higher risk for diabetes.
+7. The average of diabetesPedigreeFunction (0.47 or 47%) shows that there are significant heredity predisposition towards diabetes, in which may be a major factor in predicting the diabetes outcome considering heredity plays a huge part in diabetes.  
+8. The mean frequencies of age is around 33.  
+
+```{r}
+# categorical 
+outcome_counts <- table(df$Outcome)
+labels_outcome <- c("No Diabetes", "Has Diabetes")
+
+outcome_pie <- plot_ly(labels = labels_outcome,
+                       values = as.numeric(outcome_counts),
+                       type = 'pie',
+                       textinfo = 'label+percent') %>%
+  layout(title = "Diabetes Distribution")
+
+outcome_pie
+```
+There are 34.9% of adult female participants sample in Pima Indians of Arizona that has diabetes.  
+
+### Spread
+```{r}
+# numerical(IQR/range)
+# Function to calculate Q1, Q3, and IQR
+calculate_quartiles <- function(x) {
+  q1 <- quantile(x, 0.25, na.rm = TRUE)
+  q3 <- quantile(x, 0.75, na.rm = TRUE)
+  iqr <- IQR(x, na.rm = TRUE)
+  return(c(Q1 = q1, Q3 = q3, IQR = iqr))
+}
+
+quartile_stats <- sapply(df, calculate_quartiles)
+quartile_stats <- t(quartile_stats)
+print(quartile_stats)
+```
+_EXPLANATION_  
+1. With a Q1 of 1, a Q3 of 6, and an IQR of 5, the number of pregnancies shows that 50% of the data lies between 1 and 6 pregnancies.  
+2. The glucose levels have a Q1 of 99.75, a Q3 of 140.25, and an IQR of 40.5. Altho the data also shows that 50% of the participant's blood glucose levels in the OGTT remain considered as normal, the spread (IQR) indicates that there is medium variability in blood glucose levels among individuals.  
+3. The diastolic blood pressure measurements, which have a Q1 of 64, a Q3 of 80, and an IQR of 16, shows that although individual variations may exist in the data, 50% of the participant's blood pressure still considered as normal.  
+4. Skin thickness values show a narrow distribution in the data, with a range from a Q1 of 23 to a Q3 of 32 with an IQR of 9. However, 50% of participants have a skin thickness level that can be considered high, showing higher levels of body fat.  
+5. Insulin levels have a Q1 of 30.5, a Q3 of 127.25, and an IQR of 96.75, showing there are significant variability that might be caused by outliers.  
+6. The body mass index has a Q1 of 27.5, a Q3 of 36.6, and an IQR of 9.1, indicating there are variability of body mass indices. However, 50% of participants are considered as Overweight and Obesed.  
+7. The Diabetes Pedigree Function has a Q1 of 0.24375, a Q3 of 0.62625, and an IQR of 0.3825, showing there are medium variability in the percentage of risk of developing diabetes.     
+8. The age distribution shows a Q1 of 24, a Q3 of 41, and an IQR of 17, showing that there is a wide age range among individuals.  
+9. The outcome variable, which is categorical of (0 = non-diabetical) and (1 = diabetical), has a Q1 of 0, a Q3 of 1, and an IQR of 1.  
+
+
+### Shape
+```{r}
+# graphical (histogram)
+
+create_histogram <- function(data, variable_name){
+  plot <- plot_ly(
+    data = data,
+    x = ~get(variable_name),
+    type = 'histogram',
+    textinfo = "text") %>%
+    layout(
+      title = paste("Histogram of", variable_name),
+      xaxis = list(title = variable_name),
+      yaxis = list(title = "Frequency")
+    )
+  return(plot)
+}
+
+histograms <- lapply(names(df), function(var) create_histogram(df, var))
+for(plot in histograms){
+  print(plot)
+}
+```
+_EXPLANATION_  
+From the histogram above we can conclude that:  
+- Pregnancies : right (positive) skewed  
+- Glucose : almost normally distributed but right (positive) skewed  
+- BloodPressure : normally distributed  
+- SkinThickness : right (positive) skewed    
+- Insulin : right (positive) skewed  
+- BMI : right (positive) skewed  
+- DiabetesPedigreeFunction : right (positive) skewed  
+- Age : right (positive) skewed  
+- Outcome : right (positive) skewed  
+
+```{r}
+# Function to calculate skewness
+calculate_skewness <- function(x){
+  n <- length(x)
+  mean_x <- mean(x, na.rm = TRUE)
+  sd_x <- sd(x, na.rm = TRUE)
+  skewness <- sum((x - mean_x)^3, na.rm = TRUE) / (n * sd_x^3)
+  return(skewness)
+}
+
+# Function to calculate kurtosis
+calculate_kurtosis <- function(x){
+  n <- length(x)
+  mean_x <- mean(x, na.rm = TRUE)
+  sd_x <- sd(x, na.rm = TRUE)
+  kurtosis <- sum((x - mean_x)^4, na.rm = TRUE) / (n * sd_x^4) - 3
+  return(kurtosis)
+}
+
+skewness_results <- sapply(df, function(x) if (is.numeric(x)) calculate_skewness(x) else NA)
+kurtosis_results <- sapply(df, function(x) if (is.numeric(x)) calculate_kurtosis(x) else NA)
+
+results <- data.frame(
+  Skewness = skewness_results,
+  Kurtosis = kurtosis_results
+)
+
+print(results)
+```
+_EXPLANATION_
+Pregnancies  
+- Skewness: 0.898 (positively skewed or it means right tailed distribution)  
+- Kurtosis: 0.142 (normal distribution)  
+Glucose  
+- Skewness: 0.531 (positively skewed or right tailed distribution)  
+- Kurtosis: -0.272 (slightly lighter tails or lesser outlier)  
+BloodPressure  
+- Skewness: 0.172 (symmetric)  
+- Kurtosis: 1.054 (slightly heavier tails or more outlier)  
+SkinThickness  
+- Skewness: 1.218 (positively skewed or right tailed distribution)  
+- Kurtosis: 4.659 (significantly heavy tails or more outlier)  
+Insulin  
+- Skewness: 2.683 (positively skewed or right tailed distribution)  
+- Kurtosis: 9.637 (very heavy tails or there so many outlier)  
+BMI  
+- Skewness: 0.599 (positively skewed or right tailed distribution)  
+- Kurtosis: 0.897 (slightly heavier tails or more outllier)  
+DiabetesPedigreeFunction  
+- Skewness: 1.912 (positively skewed or right tailed outlier)  
+- Kurtosis: 5.529 (significantly heavy tails or more outlier)  
+Age  
+- Skewness: 1.125 (positively skewed or right tailed distributiom)  
+- Kurtosis: 0.622 (slightly heavier tails or more outlier)  
+Outcome  
+- Skewness: 0.633 (spositively skewed or right tailed distribution)  
+- Kurtosis: -1.602 (significantly lighter tails or lesser outlier)  
+
+## b) FREQUENCY DISTRIBUTION 
+### Number of Diabetic People
+```{r}
+plotdata <- df %>%
+ count(Outcome)
+
+ggplot(plotdata, 
+       aes(x = reorder(Outcome, -n), y = n)) + 
+  geom_bar(stat="identity", fill = "cornflowerblue",color="gray") + geom_text(aes(label = n), vjust=-0.4)+
+  labs(x = "Diabetes", 
+       y = "Frequency", 
+       title  = "Number of Diabetic People",
+       subtitle = "0: No, 1: Yes")
+```
+#### Frequency of Pregnancies
+```{r}
+ggplot(df, aes(x = Pregnancies)) +
+  geom_histogram(fill = "pink", 
+                 color = "black", 
+                 bins = 15) + 
+  labs(title="Frequency of Pregnancies", 
+       subtitle = "number of bins = 15",
+       x = "Pregnancies")
+```
+### Glucose level
+```{r}
+ggplot(df, aes(x = Glucose)) +
+  geom_histogram(fill = "coral", 
+                 color = "black", 
+                 bins = 30) + 
+  labs(title="Patient by Glucose Level", 
+       subtitle = "number of bins = 30",
+       x = "Glucose Level")
+```
+### Blood Pressure level
+```{r}
+ggplot(df, aes(x = BloodPressure)) +
+  geom_histogram(fill = "lightgreen", 
+                 color = "black", 
+                 bins = 30) + 
+  labs(title="Patient by Blood Pressure Level", 
+       subtitle = "number of bins = 30",
+       x = "Blood Pressure")
+```
+### Participant by Skin Thickness
+```{r}
+ggplot(df, aes(x = SkinThickness)) +
+  geom_histogram(fill = "magenta", 
+                 color = "black", 
+                 bins = 20) + 
+  labs(title="Patient by Skin Thickness", 
+       subtitle = "number of bins = 20",
+       x = "Skin Thickness")
+```
+### Participant by Insulin
+```{r}
+ggplot(df, aes(x = Insulin)) +
+  geom_histogram(fill = "purple", 
+                 color = "black", 
+                 bins = 15) + 
+  labs(title="Patient by Insulin", 
+       subtitle = "number of bins = 15",
+       x = "Insulin")
+```
+#### Participant by BMI
+```{r}
+ggplot(df, aes(x = BMI)) +
+  geom_histogram(fill = "orange", 
+                 color = "black", 
+                 bins = 30) + 
+  labs(title="Patient by BMI", 
+       subtitle = "number of bins = 30",
+       x = "BMI")
+
+```
+#### Diabetes Pedigree Function
+```{r}
+ggplot(df, aes(x = DiabetesPedigreeFunction)) +
+  geom_histogram(fill = "darkgreen", 
+                 color = "black", 
+                 bins = 25) + 
+  labs(title="Patient by Diabetes Pedigree Function", 
+       subtitle = "number of bins = 25",
+       x = "Diabetes Pedigree Function")
+```
+#### Participant by Age
+```{r}
+ggplot(df, aes(x = Age)) +
+  geom_histogram(fill = "yellow", 
+                 color = "black", 
+                 bins = 30) + 
+  labs(title="Patient by Age", 
+       subtitle = "number of bins = 30",
+       x = "Age")
+```
+
+
+## c) DATA VISUALIZATION
+### What is the indicator of Diabetes?
+**Glucose vs Outcome**  
+```{r}
+plot_ly(data = df, x = ~Outcome, y = ~Glucose, type = "box", boxmean = TRUE, 
+        marker = list(color = 'red'), 
+        line = list(color = 'red'),
+        fillcolor = 'rgba(255,0,0,0.5)') %>%
+  layout(title = "Glucose Levels vs Outcome",
+         xaxis = list(title = "Outcome"),
+         yaxis = list(title = "Glucose Level"))
+```
+As mentioned before, the dataset contains the result of Oral Glucose Tolerance Test (OGTT), in which is used to observe the body's reaction in processing glucose, which can help to identify insulin resistance and diabetes.  
+  
+Here in the plot, we can see median glucose level is significantly higher for individuals with diabetes (Outcome = 1) compared to those without diabetes (Outcome = 0).  
+  - Median glucose level without diabetes = 107.5  
+  - Median glucose level with diabetes = 140  
+  - Mean glucose level without diabetes = 110.7  
+  - Mean glucose level with diabetes = 142.2  
+By looking the outliers between each group, we can see that the diabetic group glucose levels are closer to a normal distribution, while the non-diabetic group glucose level are right-skewed. The diabetical group has fewer outliers showing that they have more consistency in their range of glucose level.  
+  
+The IQR is higher for individuals with diabetes, indicating there is more variability in glucose levels within the diabetic group (IQR = 119 ~ 167), while the non-diabetic group has more narrow variation (IQR = 93 ~ 125).  
+  
+In conclusion, the box plot clearly shows that the result of OGTT for individuals with diabetes, tend to keep their glucose levels high even after 2 hours, showing there are insulin incapability of regulate glucose concentration in blood, this condition is also known as Insulin Resistance.  
+  
+**Insulin vs Outcome**  
+```{r}
+plot_ly(data = df, x = ~Outcome, y = ~Insulin, type = "box", boxmean = TRUE, 
+        marker = list(color = 'red'), 
+        line = list(color = 'red'),
+        fillcolor = 'rgba(255,0,0,0.5)') %>%
+  layout(title = "Insulin Levels vs Outcome",
+         xaxis = list(title = "Outcome"),
+         yaxis = list(title = "Insulin Level"))
+```
+Here in the plot, we can see median glucose level is  higher for individuals without diabetes (Outcome = 0) compared to those with diabetes (Outcome = 1).  
+  - Median glucose level without diabetes = 39  
+  - Median glucose level with diabetes = 30.5  
+  - Mean glucose level without diabetes = 83.188  
+  - Mean glucose level with diabetes = 116.041  
+By looking the outliers between each group, we can see that both the diabetic and non-diabetical group insulin levels have many extreme values, showing that there are individuals with or without diabetes that tend to have a high insulin level postest. 
+  
+The IQR is higher for individuals with diabetes, indicating there is more variability in inslulin levels within the diabetic group (IQR = 30.5 ~ 167.5), while the non-diabetic group has more narrow variation (IQR = 30.5 ~ 105).  
+  
+In conclusion, the box plot shows that the result of OGTT for people with diabetes, the insulin levels remains high or show a delayed response, indicating the failed body's attempt to manage the high blood glucose levels. That makes insulin can't really get the job done breaking down glucose.  
+
+### How does lifestyle affect Diabetes?
+**SkinThickness vs BMI vs Outcome**
+```{r}
+plot_ly(
+  data = df,
+  x = ~SkinThickness,
+  y = ~BMI,
+  type = "scatter",
+  mode = "markers",
+  color = ~Outcome,
+  colors = c('Non Diabetes' = 'yellow', 'Diabetes' = 'red')
+) %>%
+  layout(
+    title = "Skin Thickness vs BMI",
+    xaxis = list(title = "Skin Thickness"),
+    yaxis = list(title = "BMI"),
+    legend = list(title = list(text = 'Outcome'))
+  )
+```
+On the plot we can see there a positive linear relationship between BMI and SkinThickness. Having a thicker skin fold indicates a higher body fat, people that have higher BMI will also have a high skinfold thickness.  
+
+In the plot we can also see that individuals that in fact have a higher BMI and higher levels of SkinThickness are more likely to suffers from diabetes, due to obesity.  
+
+```{r}
+df.temp <- df
+df.temp$BMI[df$BMI<18.5] <- "Underweight"
+df.temp$BMI[df$BMI>=18.5 & df$BMI<=24.9] <- "Normal"
+df.temp$BMI[df$BMI>=25.0 & df$BMI<=29.9] <- "Overweight"
+df.temp$BMI[df$BMI>=30.0] <- "Obesity"
+df.temp
+```
+First, we categorized the BMI category into Underweight, Normal, Overweight, and Obesity.  
+  
+** Obesity vs Outcome**  
+```{r}
+counts <- as.data.frame(with(df.temp, table(BMI, Outcome)))
+colnames(counts) <- c("BMI", "Outcome", "Freq")
+
+counts <- counts %>%
+  group_by(BMI) %>%
+  mutate(prop = Freq / sum(Freq))
+
+outcome_colors <- c("1" = 'salmon', "0" = 'lightyellow')
+
+plot_ly(
+  data = counts,
+  x = ~BMI,
+  y = ~prop,
+  color = ~Outcome,
+  colors = outcome_colors,
+  type = "bar"
+) %>%
+  layout(
+    title = "Proportion of Outcomes by BMI Category",
+    barmode = "stack",
+    xaxis = list(title = "BMI", categoryorder = "array", categoryarray = c("Underweight", "Normal", "Overweight", "Obesity")),
+    yaxis = list(title = "Frequency"),
+    legend = list(title = list(text = "Outcome", font = list(size = 15, color = "black")))
+  )
+```
+The graph show that there is no Underweight individual that has diabetes, only 6.9% individuals with Normal BMI that have diabetes, 22.3% Overweight individuals in fact have diabetes, and lastly, 45.8% individuals that have obesity also suffer from diabetes.  
+  
+Here we can conclude that individuals that classified as Overweight and Obese have significantly higher risk of having diabetes compared to those with a Normal BMI or who are Underweight. So it is crucial to maintain a healthy BMI to reduce the risk of diabetes.  
+  
+**Age vs Outcome**
+```{r}
+age_counts <- as.data.frame(with(df, table(Age, Outcome)))
+colnames(age_counts) <- c("Age", "Outcome", "Freq")
+
+age_counts <- age_counts %>%
+  group_by(Age) %>%
+  mutate(prop = Freq / sum(Freq))
+
+outcome_colors <- c('0' = '#FFFDD0', '1' = 'lightblue')
+
+# Plot the stacked bar chart with Plotly
+plot_ly(
+  data = age_counts,
+  x = ~Age,
+  y = ~prop,
+  color = ~Outcome,
+  colors = outcome_colors,
+  type = "bar"
+) %>%
+  layout(
+    barmode = "stack",
+    xaxis = list(title = "Age"),
+    yaxis = list(title = "Frequency")
+  )
+```
+There is higher proportion of outcome 0 (non-diabetical) in younger individuals between ages 20 to 35, with gradual decrease in frequencies in between. Between the age of 36 to 54, the outcome 1 (diabetical) start to become dominant where it is more common than outcome 0. From age 55 and above the green bars (diabetical) is continue to dominate.  
+  
+This suggest that non-diabetical is more relevant to younger people, while diabetes issue becomes increasingly common as people starting to age, dominating in the older age groups.  
+
+### How heredity affect diabetes?
+**DiabetesPedigreeFunction vs Outcome**  
+```{r}
+pedigree_counts <- as.data.frame(with(df, table(DiabetesPedigreeFunction, Outcome)))
+colnames(pedigree_counts) <- c("DiabetesPedigreeFunction", "Outcome", "Freq")
+
+pedigree_counts <- pedigree_counts %>%
+  group_by(DiabetesPedigreeFunction) %>%
+  mutate(propp = Freq / sum(Freq))
+
+# Plotting the scatter plot
+plot_ly(
+  data = pedigree_counts,
+  x = ~DiabetesPedigreeFunction,
+  y = ~propp,
+  type = "bar",
+  #mode = "lines+markers",
+  jitter = 0.1,
+  color = ~Outcome,
+  colors = c('0' = 'lightyellow', '1' = 'red')
+) %>%
+layout(
+  title = "Proportion of Outcomes by Diabetes Pedigree Function",
+  xaxis = list(title = "Diabetes Pedigree Function"),
+  yaxis = list(title = "Frequency")
+)
+
+```
+From the graph we can see, at lower values of DiabetesPedigreeFunction, there are more yellow bars, showing there is a higher proportion of non-diabetical individuals. But as the DiabetesPedigreeFunction value increase the proportion of diabetic individuals (red bars) is also increasing. 
+  
+We can conclude that DiabetesPedigreeFunction is in fact affect the Outcome of diabetes, with a positive linear relationship.   
+
+### Why DiabetesS is a problem?
+```{r}
+count_data <- df %>%
+  group_by(BloodPressure, Outcome) %>%
+  summarise(Count = n()) %>%
+  ungroup()
+
+count_data_0 <- count_data %>% filter(Outcome == 0)
+count_data_1 <- count_data %>% filter(Outcome == 1)
+
+fig <- plot_ly()
+
+fig <- fig %>% add_trace(
+  x = ~count_data_0$BloodPressure,
+  y = ~count_data_0$Count,
+  type = "scatter",
+  mode = "lines",
+  name = "No Diabetes",
+  line = list(color = 'darkred') # Darker shade of red
+)
+
+fig <- fig %>% add_trace(
+  x = ~count_data_1$BloodPressure,
+  y = ~count_data_1$Count,
+  type = "scatter",
+  mode = "lines+markers",
+  name = "Has Diabetes",
+  line = list(color = 'red')
+)
+
+fig <- fig %>% layout(
+  title = "Distributions Blood Pressure by Outcome",
+  xaxis = list(title = "Blood Pressure"),
+  yaxis = list(title = "Count"),
+  legend = list(title = list(text = 'Outcome'))
+)
+
+fig
+```
+From the graph, we can see that both groups have a quite similar range of blood pressure values, with non-diabetical's bloodPressure range from 24 to 122 mm hg, and diabetical's bloodPressure range from 30 to 144 mm hg. This shows that there is possible increase of blood pressure in individuals with diabetes and it is crucial for people with diabetes to continue monitoring their blood pressure to prevent further complications.  
+
+
+## d) DATA ANOMALIES/OUTLIERS
+### ThreeSigma, Hampel, Boxplot Rule
+```{r}
+# nMiss for missing value, nOut for outlier
+# lowLim upLim, lower and upper outlier detection limits
+
+find_outliers_summary <- function(x){
+  outliers <- FindOutliers(x)
+  return(outliers$summary)
+}
+
+summary_list <- lapply(df, find_outliers_summary)
+summary_list
+```
+Number of outliers using ThreeSigma method:  
+- Pregnancies : 4  
+- Glucose : 0  
+- BloodPressure : 8  
+- SkinThickness : 4   
+- Insulin : 19   
+- BMI : 5  
+- DiabetesPedigreeFunction : 11  
+- Age : 5 
+- Outcome : 0  
+  
+Number of outliers using Hampel method:  
+- Pregnancies : 23  
+- Glucose : 0  
+- BloodPressure : 10  
+- SkinThickness : 31   
+- Insulin : 316   
+- BMI : 8  
+- DiabetesPedigreeFunction : 40  
+- Age : 27  
+- Outcome : 268  
+  
+Number of outliers using BoxplotRule method:  
+- Pregnancies : 4  
+- Glucose : 36  
+- BloodPressure : 63  
+- SkinThickness : 124   
+- Insulin : 49   
+- BMI : 58  
+- DiabetesPedigreeFunction : 29  
+- Age : 9
+- Outcome : 0  
+
+
+### using boxplot
+```{r}
+count_outliers <- function(x) {
+  bp <- boxplot(x, plot = FALSE)
+  out <- length(bp$out)
+  boxplot(x)
+  mtext(paste("Outliers: ", out), side = 1)
+}
+
+sapply(df, count_outliers)
+```
+The numbers of outlier using boxplot:  
+- Pregnancies : 4  
+- Glucose : 0  
+- BloodPressure : 14  
+- SkinThickness : 35   
+- Insulin : 49   
+- BMI : 8  
+- DiabetesPedigreeFunction : 29  
+- Age : 9
+- Outcome : 0  
+
+### Using formula
+```{r}
+count_outliers2 <- function(x) {
+  q1 <- quantile(x, p = 0.25)
+  q3 <- quantile(x, p = 0.75)
+  iqr <- IQR(x)
+  # determine outliers
+  outliers <- ifelse(x < q1 - 1.5 * iqr | x > q3 + 1.5 * iqr, TRUE, FALSE)
+  # sum of outliers
+  num_outliers <- sum(outliers)
+  
+  return(num_outliers)
+}
+
+num_outliers <- sapply(df, count_outliers2)
+print(num_outliers)
+```
+
+# 5. STATISTICAL ANALYSIS
+## a) Checking Precondition 
+**shapiro-wilk test**  
+```{r}
+shapiro.test(df$Glucose)
+shapiro.test(df$BloodPressure)
+shapiro.test(df$SkinThickness)
+shapiro.test(df$Insulin)
+shapiro.test(df$BMI)
+shapiro.test(df$DiabetesPedigreeFunction)
+shapiro.test(df$Outcome)
+```
+The Shapiro-Wilk tests shows that none of these variables has a normal distribution (mostly because outliers). The low p-values (all < 0.05) indicate strong evidence against the assumption of normality, thus we accept the null hypothesis of non-normality.  
+  
+Although most of the variables didn't pass the normality test, we are still going to check the relationship between them.  
+
+## b) Find Correlation
+**Correlation Plot**  
+```{r}
+c <- cor(df)
+corrplot(c, type = "upper", method = "number", tl.cex = 0.7)
+```
+Here we can see there are variables that have a quite strong relationship:  
+  1. SkinThickness vs Insulin = obesity and the insulin resistant   
+  2. Age vs Pregancies  
+  3. Glucose vs Outcomes = result of OGTT for people with diabetes  
+  4. Glucose vs Insulin  
+  5. BloodPressure vs Age  
+  6. BMI vs Outcome  
+  
+  
+**Pearson's Correlation**  
+```{r}
+correlation1 <- cor.test(df$Glucose, df$Outcome, method = "pearson")
+correlation1
+```
+Correlation Coefficient (cor): The test shows a statistically significant positive correlation between Glucose and Outcome, though the strength of the correlation is relatively strong (0.49). 
+  
+Significance (p-value): The p-value of 2.2e-16 is very small (less than 0.05), suggesting strong evidence against the null hypothesis. Therefore, we reject the null hypothesis that there is no correlation between Glucose and Outcome.  
+  
+Confidence Interval: We are 95% confident that the true population correlation coefficient falls between 0.4374171 and 0.5446602.    
+  
+Conclusion:  
+There is a statistically significant, strong-positive correlation (r = 0.4929084) between Glucose and Outcome. This suggests that as Glucose increases, there tends to be a significant increase in the Outcome. However, the correlation is strong, as the correlation coefficient is relatively close to one. In summary, while there is a statistically significant positive correlation between Glucose and Outcome, and so (r^2 = 0.24295015047576), 24.3% variance of the Outcome can be explained by knowing the Glucose level. So, Glucose alone may not be a strong predictor of Outcome (diabetes). Other factors likely contribute more significantly to determining the outcome.      
+
+```{r}
+correlation2 <- cor.test(df$Insulin, df$Outcome, method = "pearson")
+correlation2
+```
+Correlation Coefficient (cor): The test shows a statistically significant positive correlation between Insulin and Outcome, though the strength of the correlation is relatively weak (0.1484572 ). 
+  
+Significance (p-value): The p-value of 3.622e-05 is very small (less than 0.05), suggesting strong evidence against the null hypothesis. Therefore, we reject the null hypothesis that there is no correlation between Insulin and Outcome.  
+  
+Confidence Interval: We are 95% confident that the true population correlation coefficient falls between 0.07853781 and 0.21692327.    
+  
+Conclusion:  
+There is a statistically significant, weak-positive correlation (r = 0.1484572) between Insulin and Outcome. This suggests that as Insulin increases, there tends to be a slight increase in the Outcome. However, the correlation is weak, as the correlation coefficient is relatively close to zero. In summary, while there is a statistically weak positive correlation between Insulin and Outcome, and so (r^2 = 0.02204118108884), only 2.2% variance of the Outcome can be explained by knowing the Insulin level. So, Insulin alone may not be a strong predictor of Outcome (diabetes). Other factors likely contribute more significantly to determining the outcome.    
+
+```{r}
+correlation3 <- cor.test(df$BMI, df$Outcome, method = "pearson")
+correlation3
+```
+Correlation Coefficient (cor): The test shows a statistically significant positive correlation between BMI and Outcome, though the strength of the correlation is relatively weak (0.3122541). 
+  
+Significance (p-value): The p-value of 2.2e-16 is very small (less than 0.05), suggesting strong evidence against the null hypothesis. Therefore, we reject the null hypothesis that there is no correlation between BMI and Outcome.  
+  
+Confidence Interval: We are 95% confident that the true population correlation coefficient falls between 0.2469654 and 0.3747208    
+  
+Conclusion:  
+There is a statistically significant, weak-positive correlation (r = 0.3122541) between BMI and Outcome. This suggests that as BMI increases, there tends to be a slight increase in the Outcome. However, the correlation is weak, as the correlation coefficient is relatively close to zero. In summary, while there is a statistically weak positive correlation between BMI and Outcome, and so (r^2 = 0.09757658500881), only 9.8% variance of the Outcome can be explained by knowing the BMI level. So, BMI alone may not be a strong predictor of Outcome (diabetes). Other factors likely contribute more significantly to determining the outcome.      
+  
+```{r}
+correlation4 <- cor.test(df$DiabetesPedigreeFunction, df$Outcome, method = "pearson")
+correlation4
+```
+Correlation Coefficient (cor): The test shows a statistically significant positive correlation between DiabetesPedigreeFunction and Outcome, though the strength of the correlation is relatively weak (0.174).  
+  
+Significance (p-value): The p-value of 1.255e-06 is very small (less than 0.05), suggesting strong evidence against the null hypothesis. Therefore, we reject the null hypothesis that there is no correlation between DiabetesPedigreeFunction and Outcome.  
+  
+Confidence Interval: This interval indicates that we are 95% confident that the true population correlation coefficient falls between 0.1043836 and 0.2416168.  
+  
+Conclusion:  
+There is a statistically significant, weak-positive correlation (r = 0.1738441) between DiabetesPedigreeFunction and Outcome. This suggests that as DiabetesPedigreeFunction increases, there tends to be a slight increase in the Outcome. However, the correlation is not strong, as the correlation coefficient is relatively close to zero. In summary, while there is a statistically weak positive correlation between DiabetesPedigreeFunction and Outcome, and so (r^2 = 0.03023773468), only 3% variance of the Outcome can be explained by knowing the DiabetesPedigreeFunction level. So, DiabetesPedigreeFunction alone may not be a strong predictor of Outcome (diabetes). Other factors likely contribute more significantly to determining the outcome.    
+
+```{r}
+correlation5 <- cor.test(df$Outcome, df$BloodPressure, method = "pearson")
+correlation5
+```
+Correlation Coefficient (cor): The test shows a statistically significant positive correlation between BloodPressure and Outcome, though the strength of the correlation is relatively weak (0.1629863).  
+  
+Significance (p-value): The p-value of 1.255e-06 is very small (less than 0.05), suggesting strong evidence against the null hypothesis. Therefore, we reject the null hypothesis that there is no correlation between BloodPressure and Outcome.  
+  
+Confidence Interval: This interval indicates that we are 95% confident that the true population correlation coefficient falls between 0.0933180 and 0.2310663.  
+  
+Conclusion:  
+There is a statistically significant, weak-positive correlation (r = 0.1629863 ) between BloodPressure and Outcome. This suggests that as BloodPressure increases, there tends to be a slight increase in the Outcome. However, the correlation is not strong, as the correlation coefficient is relatively close to zero. In summary, while there is a statistically weak positive correlation between BloodPressure and Outcome, and so (r^2 = 0.02654817969), only 2.7% variance of the BloodPressure. can be explained by knowing the BloodPressure level. So, Outcome alone may not be a strong predictor of BloodPressure. Other factors likely contribute more significantly to determining the outcome. 
+
+
+## c) Check the Regression
+```{r}
+#     dependent(response) independent
+regre <- lm(Outcome ~ DiabetesPedigreeFunction, data =df)
+summary(regre)
+```
+
+# 6. DISCUSSION
+From the Pima Indians sample that took OGTT we gained knowledge, that there are two factors that influence diabetes.  
+  
+OGTT results show the insulin resistance one person has, by looking at Glucose and Insulin levels after 2 hours (most effective). If a person has high glucose results, this indicates insulin failure in breaking down glucose into smaller substances for use by body cells. High insulin results also indicate that the insulin in the body has a delayed response and fails to break down glucose (the pancreas only produces insulin, but the insulin does not work properly).  
+  
+Firstly, lifestyle took major parts in developing diabetes. People with higher BMI and SkinThickness tends to suffer from diabetes. People who have high body fat will also have high skin fold thickness. Most people that have obesity, tend to eat unhealthy and unbalanced food, consuming too much sugar and processed food. As a result, they are more likely to develop diabetes. Most people underestimate a healthy lifestyle and think that it is not important. Many people from a young age do not pay attention to the physical activity, eventhough the negative impacts can be felt from a young age, it is proven that diabetes begins to develop from the age of 35, and continues to develop in line with increasing age.  
+  
+Second, heredity factor. People who have a history of diabetes in their family are more likely to develop diabetes. People who have a high DiabetesPedigreeFunction have more chance to grow probability of diabetes even with healthy lifestyle.  
+  
+Why maintaining diabets is important? Diabetes can affect a person's blood pressure due to insulin resistance. This can cause worse complications such as inflammation and vascular damage.  
+
+
+# 7. CONCLUSION
+From the analysis that we have conduct, We conclude that someone can get diabetes because of their daily lifestyle habits. Data have shown that people that have BMI levels of Overweight and Obesity are more likely to have diabetes. That's why it's really important to maintain a healthy lifestyle every day. However, there's also a chance that we can get diabetes due to family history. Genetic factor can increase the likelihood of developing diabetes, even with a healthy lifestyle. So, it's very important to check if we carry diabetes or not and let's also always maintain your glucose blood in normal level for avoiding any further complication.  
+  
+For future research, I suggest looking deeper at lifestyle factors and their influence on diabetes, so that in the future there can be an efficient program to prevent diabetes from developing in people who already have hereditary factors.  
+
+# 8. REFFERENCES
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4418458/  
+https://towardsdatascience.com/pima-indian-diabetes-prediction-7573698bd5fe  
+
